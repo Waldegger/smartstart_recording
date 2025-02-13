@@ -29,7 +29,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 class record_edit_window : public QDialog
 {
 public:
-	record_edit_window(QWidget* parent = nullptr, Qt::WindowFlags flags = { 0 });
+	record_edit_window(const std::list<recording_setting>& match_list, QWidget* parent = nullptr, Qt::WindowFlags flags = { 0 });
 public:
 	inline void set_recording_setting(const recording_setting& value) { m_recording_setting = value; }
 	inline const std::optional<recording_setting>& get_recording_setting() const { return m_recording_setting; }
@@ -42,4 +42,6 @@ private:
 	QSpinBox m_timing_spin_box{ this };
 
 	std::optional<recording_setting> m_recording_setting;
+
+	const std::list<recording_setting>* m_match_list;
 };

@@ -31,8 +31,9 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #include <sstream>
 
-record_edit_window::record_edit_window(QWidget* parent, Qt::WindowFlags flags)
+record_edit_window::record_edit_window(const std::list<recording_setting>& match_list, QWidget* parent, Qt::WindowFlags flags)
 	: QDialog(parent, flags)
+	, m_match_list{ &match_list }
 {
 	setWindowTitle(obs_module_text("add_recording_setting"));
 
@@ -47,9 +48,6 @@ record_edit_window::record_edit_window(QWidget* parent, Qt::WindowFlags flags)
 
 	auto dialog_button_box = new QDialogButtonBox(QDialogButtonBox::StandardButton::Ok | QDialogButtonBox::StandardButton::Cancel, this);
 
-	auto scene_list = std::unique_ptr<char*, std::function<void(char**)>>(obs_frontend_get_scene_names(), [](char** ptr)->void { bfree(ptr); });
-	for (size_t i = 0; scene_list.get()[i]; ++i)
-		m_scene_names_combo_box.addItem(scene_list.get()[i]);
 	m_scene_names_combo_box.setMinimumWidth(300);
 
 	m_record_action_combobox.addItem(obs_module_text("start"), static_cast<std::underlying_type_t<recording_setting::action>>(recording_setting::action::start));
@@ -111,13 +109,34 @@ void record_edit_window::showEvent(QShowEvent* ev)
 {
 	QDialog::showEvent(ev);
 
+	auto scene_list = std::unique_ptr<char*, std::function<void(char**)>>(obs_frontend_get_scene_names(), [](char** ptr)->void { bfree(ptr); });
+	for (size_t i = 0; scene_list.get()[i]; ++i)
+	{
+		auto item = scene_list.get()[i];
+
+		bool item_found = false;
+		for (auto& v : *m_match_list)
+		{
+			if (item == v.get_scene_name())
+			{
+				item_found = true;
+				continue;
+			}
+		}
+
+		if (!item_found)
+			m_scene_names_combo_box.addItem(item);
+	}
+
 	if (!m_recording_setting)
 	{
 		m_recording_setting = recording_setting{};
 		return;
 	}
-	
+
 	const auto& rec = m_recording_setting.value();
+	m_scene_names_combo_box.addItem(rec.get_scene_name().c_str());
+	
 
 	setWindowTitle(obs_module_text("edit_recording_setting"));
 

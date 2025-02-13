@@ -41,6 +41,7 @@ class plugin_window : public QMainWindow
 		void save();
 		void set_dirty(bool value);
 		bool get_dirty() const;
+		void update_new_button();
 
 		QTableWidget m_table_widget;
 		QPushButton m_new_button;

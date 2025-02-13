@@ -87,7 +87,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 
 	auto new_button_click = [this]() -> void 
 		{
-			auto edit_window = new record_edit_window{ this };
+			auto edit_window = new record_edit_window{ m_recording_setting_list, this };
 			auto dlg_finished = [this, edit_window](int result) -> void
 				{
 					if (result == QDialog::Rejected)
@@ -98,6 +98,8 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 			
 					add_row(m_recording_setting_list.back());
 					set_dirty(true);
+
+					update_new_button();
 				};
 
 			edit_window->setAttribute(Qt::WA_DeleteOnClose);
@@ -119,6 +121,8 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 			m_table_widget.removeRow(row);
 
 			set_dirty(true);
+
+			m_new_button.setEnabled(true);
 		};
 
 	auto apply_button_click = [this]() -> void
@@ -156,6 +160,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	connect(dialog_button_box->button(QDialogButtonBox::StandardButton::Apply), &QPushButton::pressed, apply_button_click);
 	connect(dialog_button_box->button(QDialogButtonBox::StandardButton::Close), &QPushButton::pressed, close_button_click);
 
+	update_new_button();
 	m_new_button.setText(obs_module_text("button.new"));
 	m_new_button.setMinimumWidth(150);
 	m_edit_button.setText(obs_module_text("button.edit"));
@@ -232,7 +237,7 @@ void plugin_window::edit_item(int row)
 {
 	auto& item = *reinterpret_cast<recording_setting*>(qvariant_cast<std::uintptr_t>(m_table_widget.item(row, 0)->data(Qt::UserRole)));
 
-	auto edit_window = new record_edit_window{ this };
+	auto edit_window = new record_edit_window{ m_recording_setting_list, this };
 	auto dlg_finished = [this, edit_window, &item, row](int result) -> void
 		{
 			if (result == QDialog::Rejected)
@@ -266,7 +271,7 @@ void plugin_window::add_row(const recording_setting& rec_setting)
 	scene_name_item->setData(Qt::UserRole, data);
 	m_table_widget.setItem(i, 0, scene_name_item);
 
-	auto action_item = new QTableWidgetItem(rec_setting.get_action() == recording_setting::action::start ? "start" : "stop");
+	auto action_item = new QTableWidgetItem(rec_setting.get_action() == recording_setting::action::start ? obs_module_text("start") : obs_module_text("stop"));
 	action_item->setTextAlignment(Qt::AlignCenter);
 	m_table_widget.setItem(i, 1, action_item);
 
@@ -303,4 +308,31 @@ void plugin_window::set_dirty(bool value)
 bool plugin_window::get_dirty() const
 {
 	return m_dirty;
+}
+
+void plugin_window::update_new_button()
+{
+	auto scene_list = std::unique_ptr<char*, std::function<void(char**)>>(obs_frontend_get_scene_names(), [](char** ptr)->void { bfree(ptr); });
+	m_new_button.setEnabled(false);
+
+	for (size_t i = 0; scene_list.get()[i]; ++i)
+	{
+		auto item = scene_list.get()[i];
+
+		bool item_found = false;
+		for (auto& v : m_recording_setting_list)
+		{
+			if (item == v.get_scene_name())
+			{
+				item_found = true;
+				break;
+			}
+		}
+
+		if (!item_found)
+		{
+			m_new_button.setEnabled(true);
+			return;
+		}
+	}
 }

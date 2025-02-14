@@ -14,9 +14,6 @@ This plugin for OBS Studio allows you to start recordings automatically for each
 | macOS     | XCode 16.0 |
 | Windows, macOS  | CMake 3.30.5 |
 | Ubuntu 24.04 | CMake 3.28.3 |
-| Ubuntu 24.04 | `ninja-build` |
-| Ubuntu 24.04 | `pkg-config`
-| Ubuntu 24.04 | `build-essential` |
 
 ## Downolad
 

@@ -20,7 +20,8 @@ This plugin for OBS Studio allows you to start recordings automatically for each
 
 ## Downolad
 
-[obsproject.com](https://obsproject.com/forum/resources/smartstart-recording.2090/)
+[Win64 Installer](https://github.com/Waldegger/smartstart_recording/blob/master/releases/smartstart_recording_win64_setup.exe)
+[Win64 Zip](https://github.com/Waldegger/smartstart_recording/blob/master/releases/smartstart_recording_win64.zip)
 
 ## Build
 

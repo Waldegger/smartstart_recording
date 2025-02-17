@@ -78,6 +78,12 @@ void smartstart_recording::update_recording_settings(const std::list<recording_s
 	m_dirty = true;
 }
 
+void smartstart_recording::remove_recording_setting(std::string_view name)
+{
+	m_recording_setting_map.erase(name.data());
+	m_recording_setting_list.remove_if([&name](const recording_setting& item) -> bool {return item.get_scene_name() == name.data(); });
+}
+
 const std::list<recording_setting>& smartstart_recording::get_recording_setting_list() const
 {
 	return m_recording_setting_list;
@@ -156,18 +162,7 @@ void smartstart_recording::save_load_handler(obs_data_t* save_data, bool saving,
 
 void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 {
-	switch (event)
-	{
-		case OBS_FRONTEND_EVENT_SCENE_CHANGED:
-		{
-			auto ptr = std::unique_ptr<obs_source_t, std::function<void(obs_source_t*)>>(obs_frontend_get_current_scene(), [](obs_source_t* ptr)->void {obs_source_release(ptr); });
-			on_scene_changed(ptr.get(), nullptr);
-			
-			break;
-		}
-
-		case OBS_FRONTEND_EVENT_TRANSITION_LIST_CHANGED:
-		case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CHANGED:
+	auto connect_transition_handlers = []() -> void
 		{
 			//Set the transition handler to each transition
 			obs_frontend_source_list transition_list{ 0 };
@@ -180,17 +175,75 @@ void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 			}
 
 			obs_frontend_source_list_free(&transition_list);
-			break;
+		};
+
+	auto scene_list_changed_hander = [this]() -> void
+		{
+			auto scene_list = std::unique_ptr<char*, std::function<void(char**)>>(obs_frontend_get_scene_names(), [](char** ptr)->void { bfree(ptr); });
+
+			for (auto it = m_recording_setting_list.begin(); it != m_recording_setting_list.end(); it++)
+			{
+				bool item_found = false;
+				auto& v = *(it);
+
+				for (size_t i = 0; scene_list.get()[i]; ++i)
+				{
+					auto item = scene_list.get()[i];
+					if (item == v.get_scene_name())
+					{
+						item_found = true;
+						break;
+					}
+				}
+
+				if (!item_found)
+				{
+					m_recording_setting_map.erase(v.get_scene_name());
+					m_recording_setting_list.erase(it++);
+					m_dirty = true;
+				}
+			}
+		};
+
+	switch (event)
+	{
+		case OBS_FRONTEND_EVENT_SCENE_CHANGED:
+		{
+			auto ptr = std::unique_ptr<obs_source_t, std::function<void(obs_source_t*)>>(obs_frontend_get_current_scene(), [](obs_source_t* ptr)->void {obs_source_release(ptr); });
+			on_scene_changed(ptr.get(), nullptr);
 		}
+		break;
+
+		case OBS_FRONTEND_EVENT_SCENE_LIST_CHANGED:
+		{
+			scene_list_changed_hander();
+		}
+		break;
+
+		case OBS_FRONTEND_EVENT_TRANSITION_LIST_CHANGED:
+		{
+			connect_transition_handlers();
+		}
+		break;
+
+		case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CHANGED:
+		{
+			connect_transition_handlers();
+		}
+		break;
 
 		case OBS_FRONTEND_EVENT_SCENE_COLLECTION_CLEANUP:
 		case OBS_FRONTEND_EVENT_EXIT:
 		{
 			//Cleanup is happening here
-			break;
 		}
+		break;
+
 		default:
-			break;
+		{
+
+		}
+		break;
 	}
 }
 

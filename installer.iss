@@ -33,7 +33,7 @@ DisableProgramGroupPage=yes
 LicenseFile=.\LICENSE
 ; Uncomment the following line to run in non administrative install mode (install for current user only).
 ;PrivilegesRequired=lowest
-OutputBaseFilename=smartstart_recording_setup
+OutputBaseFilename=smartstart_recording_win64_setup
 SetupIconFile=.\media\icon.ico
 SolidCompression=yes
 WizardStyle=modern

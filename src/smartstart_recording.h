@@ -39,6 +39,7 @@ public:
 	void unload();
 
 	void update_recording_settings(const std::list<recording_setting>& new_list);
+	void remove_recording_setting(std::string_view name);
 
 	const std::list<recording_setting>& get_recording_setting_list() const;
 	const recording_setting* get_recording_setting(const std::string_view scene_name) const;

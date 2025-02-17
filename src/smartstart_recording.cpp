@@ -181,6 +181,7 @@ void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 		{
 			auto scene_list = std::unique_ptr<char*, std::function<void(char**)>>(obs_frontend_get_scene_names(), [](char** ptr)->void { bfree(ptr); });
 
+			bool update_necessary = false;
 			for (auto it = m_recording_setting_list.begin(); it != m_recording_setting_list.end(); it++)
 			{
 				bool item_found = false;
@@ -200,11 +201,12 @@ void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 				{
 					m_recording_setting_map.erase(v.get_scene_name());
 					m_recording_setting_list.erase(it++);
+					update_necessary = true;
 					m_dirty = true;
 				}
 			}
 
-			if (m_dirty)
+			if (update_necessary)
 			{
 				obs_frontend_save();
 			}

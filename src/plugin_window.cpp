@@ -295,10 +295,7 @@ void plugin_window::set_dirty(bool value)
 
 	m_dirty = value;
 
-	if (m_dirty)
-		setWindowTitle("*" + windowTitle());
-	else
-		setWindowTitle(windowTitle().mid(1));
+	setWindowTitle(m_dirty ? "*" + windowTitle() : windowTitle().mid(1));
 
 	m_dialog_button_box.button(QDialogButtonBox::StandardButton::Apply)->setEnabled(m_dirty);
 }

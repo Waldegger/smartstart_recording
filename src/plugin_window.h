@@ -21,6 +21,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include <QMainWindow>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QDialogButtonBox>
 
 #include <list>
 
@@ -47,6 +48,7 @@ class plugin_window : public QMainWindow
 		QPushButton m_new_button;
 		QPushButton m_edit_button;
 		QPushButton m_delete_button;
+		QDialogButtonBox m_dialog_button_box;
 
 		std::list<recording_setting> m_recording_setting_list;
 

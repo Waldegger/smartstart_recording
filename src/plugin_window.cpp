@@ -19,7 +19,6 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 #include "plugin_window.h"
 
 #include <QLabel>
-#include <QDialogButtonBox>
 #include <QStandardItemModel>
 #include <QHeaderView>
 #include <QGroupBox>
@@ -43,6 +42,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	, m_new_button{ this }
 	, m_edit_button{ this }
 	, m_delete_button{ this }
+	, m_dialog_button_box{ QDialogButtonBox::StandardButton::Save | QDialogButtonBox::Apply | QDialogButtonBox::StandardButton::Close, this  }
 	, m_dirty{ false }
 {
 	setWindowTitle(PLUGIN_NAME.data());
@@ -147,7 +147,6 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	auto button_layout = new QVBoxLayout{ this };
 	auto spacer_layout = new QHBoxLayout(this);
 	auto bottom_button_layout = new QHBoxLayout{ this };
-	auto dialog_button_box = new QDialogButtonBox(QDialogButtonBox::StandardButton::Save | QDialogButtonBox::Apply | QDialogButtonBox::StandardButton::Close, this);
 	
 	connect(&m_table_widget, &QTableWidget::cellDoubleClicked, table_widget_cell_double_click);
 	connect(&m_table_widget, &QTableWidget::itemSelectionChanged, table_widget_selection_changed);
@@ -156,9 +155,9 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	connect(&m_edit_button, &QPushButton::pressed, edit_button_click);
 	connect(&m_delete_button, &QPushButton::pressed, delete_button_click);
 
-	connect(dialog_button_box->button(QDialogButtonBox::StandardButton::Save), &QPushButton::pressed, save_button_click);
-	connect(dialog_button_box->button(QDialogButtonBox::StandardButton::Apply), &QPushButton::pressed, apply_button_click);
-	connect(dialog_button_box->button(QDialogButtonBox::StandardButton::Close), &QPushButton::pressed, close_button_click);
+	connect(m_dialog_button_box.button(QDialogButtonBox::StandardButton::Save), &QPushButton::pressed, save_button_click);
+	connect(m_dialog_button_box.button(QDialogButtonBox::StandardButton::Apply), &QPushButton::pressed, apply_button_click);
+	connect(m_dialog_button_box.button(QDialogButtonBox::StandardButton::Close), &QPushButton::pressed, close_button_click);
 
 	update_new_button();
 	m_new_button.setText(obs_module_text("button.new"));
@@ -169,6 +168,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	m_delete_button.setText(obs_module_text("button.delete"));
 	m_delete_button.setMinimumWidth(150);
 	m_delete_button.setEnabled(false);
+	m_dialog_button_box.button(QDialogButtonBox::StandardButton::Apply)->setEnabled(false);
 
 	table_layout->addWidget(&m_table_widget);
 	table_layout->setSizeConstraint(QLayout::SetMinAndMaxSize);
@@ -183,7 +183,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	button_layout->addWidget(&m_delete_button);
 	button_layout->setAlignment(Qt::AlignTop);
 
-	bottom_button_layout->addWidget(dialog_button_box);
+	bottom_button_layout->addWidget(&m_dialog_button_box);
 
 	vbox->addLayout(table_edit_layout);
 
@@ -293,16 +293,14 @@ void plugin_window::set_dirty(bool value)
 {
 	if (m_dirty == value) return;
 
-	if (value)
-	{
-		m_dirty = true;
+	m_dirty = value;
+
+	if (m_dirty)
 		setWindowTitle("*" + windowTitle());
-	}
 	else
-	{
-		m_dirty = false;
 		setWindowTitle(windowTitle().mid(1));
-	}
+
+	m_dialog_button_box.button(QDialogButtonBox::StandardButton::Apply)->setEnabled(m_dirty);
 }
 
 bool plugin_window::get_dirty() const

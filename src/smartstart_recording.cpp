@@ -203,6 +203,11 @@ void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 					m_dirty = true;
 				}
 			}
+
+			if (m_dirty)
+			{
+				obs_frontend_save();
+			}
 		};
 
 	switch (event)

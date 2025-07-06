@@ -31,4 +31,4 @@ cmake --preset windows-x64
 
 ## Donations
 
-Donation link coming soon
+Donation link coming soon!

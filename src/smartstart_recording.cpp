@@ -107,6 +107,8 @@ void smartstart_recording::save_load_handler(obs_data_t* save_data, bool saving,
 	constexpr std::string_view ACTION = "action";
 	constexpr std::string_view TRIGGER_TIME = "trigger_time";
 
+	(void)user_data;	//unused parameter
+
 	if (saving)
 	{
 		if (m_dirty)
@@ -162,6 +164,8 @@ void smartstart_recording::save_load_handler(obs_data_t* save_data, bool saving,
 
 void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 {
+	(void)data;	//unused parameter
+
 	auto connect_transition_handlers = []() -> void
 		{
 			//Set the transition handler to each transition
@@ -256,6 +260,8 @@ void smartstart_recording::event_handler(obs_frontend_event event, void* data)
 
 void smartstart_recording::transistion_start_handler(void* data, calldata_t* call_data)
 {
+	(void)call_data;	//unused parameter
+
 	auto transition = static_cast<obs_source_t*>(data);
 
 	auto source = obs_transition_get_source(transition, OBS_TRANSITION_SOURCE_B);
@@ -265,6 +271,8 @@ void smartstart_recording::transistion_start_handler(void* data, calldata_t* cal
 
 void smartstart_recording::source_rename_handler(void* data, calldata_t* call_data)
 {
+	(void)data;	//unused parameter
+
 	std::string new_name = calldata_string(call_data, "new_name");
 	std::string prev_name = calldata_string(call_data, "prev_name");
 

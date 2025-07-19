@@ -4,8 +4,8 @@ include("${CMAKE_CURRENT_SOURCE_DIR}/cmake/common/bootstrap.cmake" NO_POLICY_SCO
 
 project(${_name} VERSION ${_version})
 
-option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" OFF)
-option(ENABLE_QT "Use Qt functionality" OFF)
+option(ENABLE_FRONTEND_API "Use obs-frontend-api for UI functionality" ON)
+option(ENABLE_QT "Use Qt functionality" ON)
 
 include(compilerconfig)
 include(defaults)
@@ -36,20 +36,18 @@ endif()
 
 target_sources(${CMAKE_PROJECT_NAME} 
 	PRIVATE
-		src/constants.h 
-		src/plugin-main.cpp
-		src/plugin_window.cpp
-		src/plugin_window.h
-    src/recording_setting.cpp
-    src/recording_setting.h
-    src/record_edit_window.cpp
-    src/record_edit_window.h
-    src/recording_controller.cpp
-    src/recording_controller.h
-    src/smartstart_recording.cpp
-    src/smartstart_recording.h
+        src/plugin-main.cpp
+        src/plugin_window.cpp
+        src/recording_setting.cpp
+        src/record_edit_window.cpp
+        src/recording_controller.cpp
+        src/smartstart_recording.cpp
 	PUBLIC
 
 )
 
 set_target_properties_plugin(${CMAKE_PROJECT_NAME} PROPERTIES OUTPUT_NAME ${_name})
+
+target_include_directories(${CMAKE_PROJECT_NAME} PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
+)

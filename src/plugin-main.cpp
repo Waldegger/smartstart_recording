@@ -26,13 +26,13 @@ OBS_MODULE_AUTHOR("ShivaPlays")
 OBS_MODULE_USE_DEFAULT_LOCALE("smartstart_recording", "en-US")
 
 // loading function for plugin
-static bool obs_module_load(void) 
+bool obs_module_load(void)
 {
     return smartstart_recording::get().load();
 }
 
 // unload function for plugin
-static void obs_module_unload(void) 
+void obs_module_unload(void)
 {
 	smartstart_recording::get().unload();
 }

@@ -68,6 +68,7 @@ plugin_window::plugin_window(QWidget* parent, Qt::WindowFlags flags)
 	
 	auto table_widget_cell_double_click = [this](int row, int column) -> void
 		{
+			(void)column;	//unused parameter error
 			edit_item(row);
 		};
 
@@ -268,7 +269,7 @@ void plugin_window::add_row(const recording_setting& rec_setting)
 
 	auto data = reinterpret_cast<std::uintptr_t>(&rec_setting);
 	auto scene_name_item = new QTableWidgetItem(rec_setting.get_scene_name().c_str());
-	scene_name_item->setData(Qt::UserRole, data);
+	scene_name_item->setData(Qt::UserRole, QVariant::fromValue(data));
 	m_table_widget.setItem(i, 0, scene_name_item);
 
 	auto action_item = new QTableWidgetItem(rec_setting.get_action() == recording_setting::action::start ? obs_module_text("start") : obs_module_text("stop"));

@@ -18,6 +18,7 @@ with this program. If not, see <https://www.gnu.org/licenses/>
 
 #pragma once
 
+#include <cstdint>
 #include <vector>
 #include <unordered_map>
 #include <string>
@@ -61,14 +62,14 @@ class recording_setting
 		uint32_t m_trigger_time = 0;
 };
 
-static bool operator==(const recording_setting& lhs, const recording_setting& rhs)
+inline bool operator==(const recording_setting& lhs, const recording_setting& rhs)
 {
 	return lhs.get_scene_name() == rhs.get_scene_name() 
 		&& lhs.get_action() == rhs.get_action() 
 		&& lhs.get_trigger_time() == rhs.get_trigger_time();
 }
 
-static bool operator!=(const recording_setting& lhs, const recording_setting& rhs)
+inline bool operator!=(const recording_setting& lhs, const recording_setting& rhs)
 {
 	return lhs.get_scene_name() != rhs.get_scene_name()
 		|| lhs.get_action() != rhs.get_action()
